@@ -1,0 +1,2344 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>For Clara 6'13</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Caveat:wght@600&family=Montserrat:wght@300;400;500&display=swap");
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #030208;
+      font-family: 'Playfair Display', serif;
+      color: #fff;
+    }
+
+    #app {
+      width: 100%;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+
+    /* ══════════════════════════════════════
+       1. INTRO LOADING KEREN
+    ══════════════════════════════════════ */
+    #loader {
+      position: absolute;
+      inset: 0;
+      z-index: 500;
+      background: radial-gradient(ellipse at 50% 50%, #0c081c 0%, #030208 100%);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+
+    #loader.done {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(1.05);
+    }
+
+    .load-mountain-icon {
+      font-size: 52px;
+      margin-bottom: 24px;
+      animation: loadPulse 2s ease-in-out infinite;
+      filter: drop-shadow(0 0 25px rgba(192, 132, 252, 0.6));
+    }
+
+    @keyframes loadPulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 20px rgba(192, 132, 252, 0.4));
+      }
+
+      50% {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 40px rgba(232, 121, 249, 0.8));
+      }
+    }
+
+    .load-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(16px, 3.5vw, 24px);
+      letter-spacing: 8px;
+      color: #f5d0fe;
+      text-transform: uppercase;
+      text-shadow: 0 0 20px rgba(192, 132, 252, 0.6);
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .load-sub {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: rgba(216, 180, 254, 0.6);
+      margin-bottom: 28px;
+      text-transform: uppercase;
+    }
+
+    .load-bar-wrap {
+      width: min(260px, 75vw);
+      height: 3px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 3px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(192, 132, 252, 0.2);
+    }
+
+    .load-bar-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #9333ea, #e879f9, #38bdf8);
+      box-shadow: 0 0 15px #e879f9;
+      border-radius: 3px;
+      transition: width 0.1s linear;
+    }
+
+    .load-percent {
+      margin-top: 12px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      color: #e9d5ff;
+      letter-spacing: 2px;
+    }
+
+    /* ══════════════════════════════════════
+       2. TAP TO OPEN
+    ══════════════════════════════════════ */
+    #tap-screen {
+      position: absolute;
+      inset: 0;
+      z-index: 600;
+      background: radial-gradient(circle at 50% 50%, rgba(26, 14, 54, 0.94) 0%, rgba(4, 2, 10, 0.98) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      padding: 24px;
+    }
+
+    #tap-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(1.06);
+    }
+
+    .tap-ring {
+      width: 115px;
+      height: 115px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(232, 121, 249, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 45px rgba(192, 132, 252, 0.4), inset 0 0 25px rgba(232, 121, 249, 0.25);
+      animation: tapRingBreathe 3s ease-in-out infinite;
+      position: relative;
+      margin-bottom: 26px;
+    }
+
+    .tap-ring::after {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 1px dashed rgba(216, 180, 254, 0.3);
+      animation: spinClockwise 25s linear infinite;
+    }
+
+    @keyframes tapRingBreathe {
+
+      0%,
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 35px rgba(192, 132, 252, 0.4);
+      }
+
+      50% {
+        transform: scale(1.07);
+        box-shadow: 0 0 65px rgba(232, 121, 249, 0.7);
+      }
+    }
+
+    @keyframes spinClockwise {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .tap-icon {
+      font-size: 46px;
+      filter: drop-shadow(0 0 15px #f472b6);
+      animation: heartBeat 1.8s ease-in-out infinite;
+    }
+
+    @keyframes heartBeat {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.15);
+      }
+    }
+
+    .tap-label {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(18px, 4vw, 28px);
+      letter-spacing: 6px;
+      color: #fdf4ff;
+      text-transform: uppercase;
+      text-shadow: 0 0 25px rgba(232, 121, 249, 0.6);
+      text-align: center;
+    }
+
+    .tap-desc {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: clamp(13px, 2.5vw, 16px);
+      color: rgba(233, 213, 255, 0.7);
+      letter-spacing: 2px;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .tap-btn-pill {
+      margin-top: 32px;
+      padding: 12px 38px;
+      border-radius: 30px;
+      border: 1px solid rgba(232, 121, 249, 0.5);
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.75), rgba(217, 70, 239, 0.85));
+      color: #ffffff;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      box-shadow: 0 0 30px rgba(192, 132, 252, 0.5);
+      cursor: pointer;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+
+    .tap-btn-pill:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 45px rgba(232, 121, 249, 0.8);
+    }
+
+    /* ══════════════════════════════════════
+       CINEMATIC OVERLAYS & TEXTS
+    ══════════════════════════════════════ */
+    #story-text {
+      position: absolute;
+      top: 18%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 90;
+      text-align: center;
+      width: min(620px, 92vw);
+      pointer-events: none;
+      transition: opacity 1.2s ease, transform 1.2s ease;
+      opacity: 0;
+      transform: translateX(-50%) translateY(15px);
+    }
+
+    #story-text.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .st-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(16px, 3.5vw, 24px);
+      font-weight: 700;
+      letter-spacing: 5px;
+      color: #fdf4ff;
+      text-shadow: 0 0 25px rgba(232, 121, 249, 0.8);
+      margin-bottom: 8px;
+    }
+
+    .st-sub {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: clamp(13px, 2.4vw, 17px);
+      color: rgba(233, 213, 255, 0.85);
+      letter-spacing: 2px;
+      line-height: 1.7;
+      text-shadow: 0 0 15px rgba(0, 0, 0, 0.85);
+    }
+
+    /* Timer / Stage Indicator */
+    #timeline-pill {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 95;
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: rgba(243, 232, 255, 0.75);
+      background: rgba(18, 10, 38, 0.55);
+      padding: 6px 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(216, 180, 254, 0.25);
+      backdrop-filter: blur(8px);
+      pointer-events: none;
+      transition: opacity 0.6s;
+    }
+
+    #audio-toggle {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      z-index: 100;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(18, 10, 38, 0.6);
+      border: 1px solid rgba(216, 180, 254, 0.25);
+      color: #d8b4fe;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    #audio-toggle:hover {
+      transform: scale(1.1);
+      background: rgba(147, 51, 234, 0.3);
+    }
+
+    /* ══════════════════════════════════════
+       LENTERA TERAKHIR INTERACTIVE PROMPT
+    ══════════════════════════════════════ */
+    #lantern-tap-prompt {
+      position: absolute;
+      top: 68%;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 330;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      text-align: center;
+    }
+
+    #lantern-tap-prompt.show {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .lt-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 34px;
+      border-radius: 35px;
+      background: linear-gradient(135deg, rgba(234, 179, 8, 0.95), rgba(236, 72, 153, 0.95));
+      box-shadow: 0 0 35px rgba(234, 179, 8, 0.7), 0 0 65px rgba(236, 72, 153, 0.5);
+      border: 1.5px solid rgba(255, 255, 255, 0.9);
+      color: #fff;
+      font-family: 'Cinzel', serif;
+      font-size: clamp(12px, 2.5vw, 15px);
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      animation: ltPulse 2s ease-in-out infinite;
+      cursor: pointer;
+    }
+
+    .lt-sub {
+      margin-top: 10px;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: clamp(12px, 2.2vw, 14.5px);
+      color: rgba(254, 240, 138, 0.95);
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+      letter-spacing: 1px;
+    }
+
+    @keyframes ltPulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 30px rgba(234, 179, 8, 0.5);
+      }
+
+      50% {
+        transform: scale(1.07);
+        box-shadow: 0 0 55px rgba(236, 72, 153, 0.9);
+      }
+    }
+
+    /* ══════════════════════════════════════
+       SURAT DARI LAMPION TERAKHIR
+    ══════════════════════════════════════ */
+    #letter-modal {
+      position: absolute;
+      inset: 0;
+      z-index: 350;
+      background: rgba(4, 2, 12, 0.85);
+      backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+      padding: 20px 16px;
+      overflow-y: auto;
+    }
+
+    #letter-modal.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    #letter-card {
+      width: min(620px, 94vw);
+      background:
+        repeating-linear-gradient(transparent, transparent 31px, rgba(168, 85, 247, 0.06) 31px, rgba(168, 85, 247, 0.06) 32px),
+        linear-gradient(165deg, #fdfaff 0%, #f5ecff 45%, #fdf2f8 100%);
+      border-radius: 12px;
+      padding: 34px 36px 38px;
+      position: relative;
+      box-shadow: 0 25px 90px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(192, 132, 252, 0.4), 0 0 60px rgba(217, 70, 239, 0.3);
+      transform: scale(0.3) translateY(40px);
+      opacity: 0;
+      transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+    }
+
+    #letter-modal.show #letter-card {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+
+    #letter-seal-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      margin: 0 auto 14px;
+      background: radial-gradient(circle at 35% 35%, #d946ef, #86198f);
+      box-shadow: 0 4px 18px rgba(217, 70, 239, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #fff;
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+    }
+
+    #letter-date-tag {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: #a21caf;
+      text-align: center;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    #letter-content p {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(13.5px, 2.4vw, 15.5px);
+      line-height: 2.15;
+      color: #2e1065;
+      margin-bottom: 12px;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.7s, transform 0.7s;
+    }
+
+    #letter-content p.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #letter-content .sig {
+      font-family: 'Caveat', cursive;
+      font-size: 26px;
+      color: #c026d3;
+      text-align: right;
+      margin-top: 18px;
+    }
+
+    #btn-finish-letter {
+      margin-top: 24px;
+      width: 100%;
+      padding: 13px 0;
+      border-radius: 30px;
+      border: none;
+      background: linear-gradient(135deg, #9333ea, #d946ef);
+      color: #fff;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 6px 25px rgba(217, 70, 239, 0.5);
+      transition: all 0.25s;
+    }
+
+    #btn-finish-letter:hover {
+      transform: scale(1.02);
+      box-shadow: 0 8px 35px rgba(217, 70, 239, 0.8);
+    }
+
+    /* ══════════════════════════════════════
+       ENDING SCREEN (USER SAYS: ENDING NYA UDAH BAGUSS)
+    ══════════════════════════════════════ */
+    #ending-wrap {
+      position: absolute;
+      inset: 0;
+      z-index: 280;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 50px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+    }
+
+    #ending-wrap.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .end-box {
+      background: rgba(18, 10, 38, 0.72);
+      padding: 24px 36px;
+      border-radius: 30px;
+      border: 1px solid rgba(232, 121, 249, 0.35);
+      backdrop-filter: blur(14px);
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 40px rgba(217, 70, 239, 0.3);
+      max-width: min(520px, 90vw);
+    }
+
+    .end-title {
+      font-family: 'Caveat', cursive;
+      font-size: clamp(26px, 5vw, 36px);
+      color: #fdf4ff;
+      text-shadow: 0 0 20px #e879f9;
+      margin-bottom: 6px;
+    }
+
+    .end-quote {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: clamp(13px, 2.2vw, 15.5px);
+      color: rgba(233, 213, 255, 0.85);
+      line-height: 1.8;
+      letter-spacing: 1px;
+    }
+
+    .btn-replay {
+      margin-top: 18px;
+      padding: 10px 28px;
+      border-radius: 24px;
+      border: 1px solid rgba(216, 180, 254, 0.4);
+      background: rgba(147, 51, 234, 0.3);
+      color: #f5d0fe;
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .btn-replay:hover {
+      background: #9333ea;
+      color: #fff;
+      transform: scale(1.06);
+      box-shadow: 0 0 25px rgba(232, 121, 249, 0.6);
+    }
+
+    @media(max-width:600px) {
+      #letter-card {
+        padding: 26px 20px 28px;
+      }
+
+      .end-box {
+        padding: 20px 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+
+    <!-- 1. TAP TO OPEN (HALAMAN PERTAMA KALI DIBUKA) -->
+    <div id="tap-screen" onclick="handleTapToOpen(event)">
+      <div class="tap-ring">
+        <div class="tap-icon">❤️</div>
+      </div>
+      <div class="tap-label">Tap to Open</div>
+      <div class="tap-desc"></div>
+    </div>
+
+    <!-- 2. INTRO LOADING KEREN (MUNCUL SETELAH TAP TO OPEN) -->
+    <div id="loader" style="display:none;">
+      <div class="load-mountain-icon">❤️</div>
+      <div class="load-title">Loading ...</div>
+      <div class="load-sub">For My Only One Claraa</div>
+      <div class="load-bar-wrap">
+        <div class="load-bar-fill" id="load-bar"></div>
+      </div>
+      <div class="load-percent" id="load-pct">0%</div>
+    </div>
+
+    <!-- BACKGROUND MUSIC AUDIO ELEMENT -->
+    <audio id="bg-audio" src="musik.mp4" loop preload="auto"></audio>
+
+    <!-- CANVAS LAYERS -->
+    <canvas id="c-aurora" style="z-index:1"></canvas>
+    <canvas id="c-stars" style="z-index:2"></canvas>
+    <canvas id="c-mountain" style="z-index:3"></canvas>
+    <canvas id="c-lanterns" style="z-index:4"></canvas>
+    <canvas id="c-ending" style="z-index:5"></canvas>
+    <canvas id="c-petals" style="z-index:6"></canvas>
+
+    <!-- TIMELINE / STAGE PILL -->
+    <div id="timeline-pill"> SPECIAL FOR MY PRETTY GF 👸🏻</div>
+
+    <!-- AUDIO TOGGLE -->
+    <div id="audio-toggle" onclick="toggleAudio()" title="Musik">🔊</div>
+
+    <!-- STORY PROSE FLOATING TEXT -->
+    <div id="story-text">
+      <div class="st-title" id="st-main">Langit Puncak Bintang</div>
+      <div class="st-sub" id="st-desc">Di antara hembusan dingin dan tarian aurora...</div>
+    </div>
+
+    <!-- 2.5 LENTERA TERAKHIR INTERACTIVE PROMPT -->
+    <div id="lantern-tap-prompt" onclick="openLetterFromLantern()">
+    </div>
+
+    <!-- 3. SURAT CINTA DARI LAMPION TERAKHIR -->
+    <div id="letter-modal">
+      <div id="letter-card">
+        <div id="letter-seal-btn">✦</div>
+        <div id="letter-date-tag">— Bandung, 06 November 2026 —</div>
+        <div id="letter-content">
+          <p id="lp1">My Soft Spot Clarisca Diah Ayu...</p>
+          <p id="lp2">Selamat tanggal 6 ya sayanggkuu! as always di hari spesial kita hehe. Aku sengaja bawa kamu ke
+            tempat
+            tertinggi yg aku tau, di bawah langit aurora dan hamparan bintang puncak gunung ini.</p>
+          <p id="lp3">gunung itu indah sayang, ga nentu cuaca nya, kadang cerah kadang hujan, seringkali juga ada badai.
+            sama kaya kamu sayang, tapi aku suka, aku suka gunung, tapi lebih suka kamuuuu</p>
+          <p id="lp4">Terima kasih sudah lahir, terima kasih udah temenin aku terus ya sayangg, makasih sudah jadi rumah
+            ternyaman untuk aku pulang. Aku sayang banget sama kamu, i love you more and alwayss ❤
+          </p>
+          <div class="sig" id="lpsig">— your batman, always</div>
+        </div>
+        <button id="btn-finish-letter" onclick="finishLetterToEnding()">
+          Next
+        </button>
+      </div>
+    </div>
+
+    <!-- 4. ENDING SCREEN (USER SAYS: ENDING NYA UDAH BAGUSS) -->
+    <div id="ending-wrap">
+      <div class="end-box">
+        <div class="end-title">I Love You, Clara ❤️</div>
+        <div class="end-quote">
+          "No matter how high we climb, I’ll always hold your hand ❤️"
+        </div>
+        <button class="btn-replay" onclick="replayAll()">
+          ↺ Once again
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    (function () {
+      /* ═══════════════════════════════════════════════════════════════
+         STATE & TIMELINE CONSTANTS
+      ═══════════════════════════════════════════════════════════════ */
+      const $ = id => document.getElementById(id);
+      const app = $('app');
+      let W = app.offsetWidth, H = app.offsetHeight;
+
+      const cAur = $('c-aurora'), cStars = $('c-stars'), cMnt = $('c-mountain');
+      const cLant = $('c-lanterns'), cEnd = $('c-ending'), cPetals = $('c-petals');
+
+      function resize() {
+        W = app.offsetWidth; H = app.offsetHeight;
+        [cAur, cStars, cMnt, cLant, cEnd, cPetals].forEach(c => {
+          c.width = W; c.height = H;
+        });
+        buildMountainGeometry();
+      }
+
+      const xAur = cAur.getContext('2d'), xStars = cStars.getContext('2d');
+      const xMnt = cMnt.getContext('2d'), xLant = cLant.getContext('2d');
+      const xEnd = cEnd.getContext('2d'), xPetals = cPetals.getContext('2d');
+
+      /* ═══════════════════════════════════════════════════════════════
+         AUDIO ENGINE (USER: musik.mp4 - DIPUTAR SAAT TAP TO OPEN)
+      ═══════════════════════════════════════════════════════════════ */
+      const bgMusic = $('bg-audio') || new Audio('musik.mp4');
+      bgMusic.loop = true;
+      bgMusic.volume = 0.75;
+
+      let audioCtx = null;
+      let audioMuted = false;
+      let audioUnlocked = false;
+
+      function playUserMusic() {
+        if (audioMuted) return;
+        const playPromise = bgMusic.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            audioUnlocked = true;
+            $('audio-toggle').textContent = '🔊';
+          }).catch((err) => {
+            setupAudioUnlock();
+            startAmbientSynth();
+          });
+        }
+      }
+
+      function setupAudioUnlock() {
+        if (audioUnlocked) return;
+        const unlock = () => {
+          if (!audioUnlocked && !audioMuted) {
+            bgMusic.play().then(() => {
+              audioUnlocked = true;
+              $('audio-toggle').textContent = '🔊';
+              if (audioCtx) {
+                try { audioCtx.close(); audioCtx = null; } catch (e) { }
+              }
+            }).catch(() => { });
+          }
+          ['click', 'touchstart', 'pointerdown', 'keydown'].forEach(ev => {
+            window.removeEventListener(ev, unlock);
+          });
+        };
+        ['click', 'touchstart', 'pointerdown', 'keydown'].forEach(ev => {
+          window.addEventListener(ev, unlock, { once: true, passive: true });
+        });
+      }
+
+      setupAudioUnlock();
+
+      function startAmbientSynth() {
+        try {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new AudioContext();
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+
+          const freqs = [130.81, 164.81, 196.00, 246.94, 329.63];
+          freqs.forEach(f => {
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            osc.type = 'sine'; osc.frequency.value = f;
+            g.gain.value = 0.015;
+            osc.connect(g); g.connect(audioCtx.destination);
+            osc.start(0);
+          });
+        } catch (e) { }
+      }
+
+      window.toggleAudio = function () {
+        audioMuted = !audioMuted;
+        $('audio-toggle').textContent = audioMuted ? '🔇' : '🔊';
+        if (audioMuted) {
+          bgMusic.pause();
+          if (audioCtx) audioCtx.suspend();
+        } else {
+          bgMusic.play().catch(() => { });
+          if (audioCtx) audioCtx.resume();
+        }
+      };
+
+      /* ═══════════════════════════════════════════════════════════════
+         STAGE 1: TAP TO OPEN → LANGSUNG MASUK HALAMAN LOADING & MUSIK
+      ═══════════════════════════════════════════════════════════════ */
+      let tapOpened = false;
+      window.handleTapToOpen = function (e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        if (tapOpened) return;
+        tapOpened = true;
+
+        // 1. Putar lagu langsung saat tap pertama (gesture user langsung lolos autoplay)
+        playUserMusic();
+
+        // 2. Transisi halus Tap-to-open memudar
+        const tapSc = $('tap-screen');
+        if (tapSc) {
+          tapSc.classList.add('hidden');
+          setTimeout(() => {
+            tapSc.style.display = 'none';
+          }, 700);
+        }
+
+        // 3. Tampilkan halaman loading dan jalankan animasi progress bar
+        const loader = $('loader');
+        if (loader) {
+          loader.style.display = 'flex';
+          loader.classList.remove('done');
+          setTimeout(() => {
+            runIntroLoader();
+          }, 50);
+        }
+      };
+
+      // Support keyboard Space / Enter untuk tap-to-open
+      window.addEventListener('keydown', (e) => {
+        if (!tapOpened && (e.code === 'Space' || e.code === 'Enter')) {
+          window.handleTapToOpen();
+        }
+      });
+
+      let loadPct = 0;
+      function runIntroLoader() {
+        const bar = $('load-bar');
+        const txt = $('load-pct');
+        loadPct = 0;
+        if (bar) bar.style.width = '0%';
+        if (txt) txt.textContent = '0%';
+
+        const interval = setInterval(() => {
+          loadPct += Math.floor(Math.random() * 8 + 5);
+          if (loadPct >= 100) {
+            loadPct = 100;
+            clearInterval(interval);
+            if (bar) bar.style.width = '100%';
+            if (txt) txt.textContent = '100% · Done';
+            setTimeout(() => {
+              $('loader').classList.add('done');
+              setTimeout(() => {
+                $('loader').style.display = 'none';
+                startExperience(); // Masuk ke pemandangan puncak dan lentera!
+              }, 600);
+            }, 300);
+          } else {
+            if (bar) bar.style.width = loadPct + '%';
+            if (txt) txt.textContent = loadPct + '%';
+          }
+        }, 35);
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         STAGE 2: SCENIC MOUNTAIN & AURORA
+      ═══════════════════════════════════════════════════════════════ */
+      let currentStage = 'IDLE'; // 'SCENIC', 'LANTERNS', 'LETTER', 'ENDING'
+      let scenicStartTime = 0;
+      let lanternsStartTime = 0;
+
+      window.startExperience = function () {
+        playUserMusic();
+        const tapSc = $('tap-screen');
+        if (tapSc) {
+          tapSc.classList.add('hidden');
+          tapSc.style.display = 'none';
+        }
+        const loader = $('loader');
+        if (loader) {
+          loader.style.display = 'none';
+        }
+
+
+
+        // After 10s -> start 1-Minute Lantern Festival
+        setTimeout(() => {
+          startLanternsStage();
+        }, 10000);
+      };
+
+      function showStory(title, desc) {
+        const el = $('story-text');
+        el.classList.remove('show');
+        setTimeout(() => {
+          $('st-main').textContent = title;
+          $('st-desc').textContent = desc;
+          el.classList.add('show');
+        }, 400);
+      }
+
+      function hideStory() {
+        $('story-text').classList.remove('show');
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         STAGE 3: 1 MENIT NAIK LAMPION & LENTERA TERAKHIR MENDEKAT
+      ═══════════════════════════════════════════════════════════════ */
+      let lanterns = [];
+      let lanternEmbers = [];
+      let lanternBurstParticles = [];
+      let lanternSpawnInterval = null;
+      let lanternStoryTimeouts = [];
+      let lastLantern = null;
+      let lastLanternState = 'IDLE'; // 'IDLE', 'APPROACHING', 'HOVERING', 'OPENING', 'OPENED'
+      let lastLanternStartTime = 0;
+      let lastLanternAutoOpenTimer = null;
+      let lastLanternOpened = false;
+
+      function startLanternsStage() {
+        currentStage = 'LANTERNS';
+        lastLanternState = 'IDLE';
+        lastLantern = null;
+        lastLanternOpened = false;
+        clearTimeout(lastLanternAutoOpenTimer);
+        lanternStoryTimeouts.forEach(t => clearTimeout(t));
+        lanternStoryTimeouts = [];
+        lanterns = [];
+        lanternEmbers = [];
+        lanternBurstParticles = [];
+
+        lanternsStartTime = Date.now();
+        $('timeline-pill').textContent = 'SPECIAL FOR MY PRETTY GF 👸🏻';
+        showStory("Ribuan Harapan Naik ke Langit", "Lampion-lampion ini membawa setiap doa terbaik dari aku untuk kita...");
+
+        // Spawn lanterns steadily from below for ~48 seconds (1 minute festival experience)
+        lanternSpawnInterval = setInterval(() => {
+          const elapsed = (Date.now() - lanternsStartTime) / 1000;
+          if (elapsed > 48) {
+            clearInterval(lanternSpawnInterval);
+            return;
+          }
+          spawnLantern();
+        }, 380);
+
+        // Poetic narrative progression throughout the 1-minute lantern flight
+        lanternStoryTimeouts.push(setTimeout(() => {
+          if (currentStage === 'LANTERNS') {
+            showStory("Cahaya di Gelapnya Malam", "Di antara luasnya semesta, ada rasa syukur yg tak terhingga karena memilikimu...");
+          }
+        }, 16000));
+
+        lanternStoryTimeouts.push(setTimeout(() => {
+          if (currentStage === 'LANTERNS') {
+            showStory("Harapan Yang Terbang Tinggi", "Setiap lampion yg naik adalah doa agar kita selalu bersama selamanya...");
+          }
+        }, 32000));
+
+        lanternStoryTimeouts.push(setTimeout(() => {
+          if (currentStage === 'LANTERNS') {
+            showStory("Menembus Langit Bintang", "Semua lentera telah membubung tinggi menghiasi langit malam...");
+          }
+        }, 48000));
+
+        // At 60 seconds (1 minute): the flock has soared high into the stars, and the Last Special Lantern approaches!
+        lanternStoryTimeouts.push(setTimeout(() => {
+          if (currentStage === 'LANTERNS') {
+            startLastLanternSequence();
+          }
+        }, 60000));
+      }
+
+      function spawnLantern() {
+        // 3 depth tiers for photorealistic parallax
+        const z = Math.random() < 0.4 ? (Math.random() * 0.25 + 0.2)
+          : (Math.random() < 0.65 ? (Math.random() * 0.3 + 0.45) : (Math.random() * 0.3 + 0.75));
+
+        const baseSize = 34;
+        const size = baseSize * z;
+
+        lanterns.push({
+          x: Math.random() * (W + 60) - 30,
+          y: H + size + Math.random() * 30,
+          z: z,
+          size: size,
+          vx: (Math.random() - 0.5) * 0.65 * z,
+          vy: -(Math.random() * 0.7 + 0.9) * (0.85 + 0.55 * z),
+          tw: Math.random() * Math.PI * 2,
+          wspd: Math.random() * 0.025 + 0.015,
+          tilt: 0,
+          alpha: Math.min(1, 0.45 + 0.6 * z),
+          isSpecial: false
+        });
+      }
+
+      function startLastLanternSequence() {
+        if (lastLanternState !== 'IDLE') return;
+        lastLanternState = 'APPROACHING';
+        lastLanternStartTime = Date.now();
+        lastLanternOpened = false;
+
+
+        const targetS = Math.min(230, Math.max(140, W * 0.32));
+
+        lastLantern = {
+          startX: W * 0.5,
+          startY: H * 0.34,
+          targetX: W * 0.5,
+          targetY: H * 0.44,
+          startSize: 22,
+          targetSize: targetS,
+          x: W * 0.5,
+          y: H * 0.34,
+          size: 22,
+          tw: 0,
+          tilt: 0,
+          alpha: 0.15,
+          isSpecial: true
+        };
+      }
+
+      function updateAndDrawLanterns() {
+        xLant.clearRect(0, 0, W, H);
+
+        // 1. Draw Embers (sparks trailing behind rising lanterns)
+        for (let i = lanternEmbers.length - 1; i >= 0; i--) {
+          const eb = lanternEmbers[i];
+          eb.x += eb.vx;
+          eb.y += eb.vy;
+          eb.life -= eb.decay;
+          if (eb.life <= 0) {
+            lanternEmbers.splice(i, 1);
+            continue;
+          }
+          xLant.beginPath();
+          xLant.arc(eb.x, eb.y, eb.r * eb.life, 0, Math.PI * 2);
+          xLant.fillStyle = `rgba(253, 224, 71, ${eb.life * 0.8})`;
+          xLant.fill();
+        }
+
+        // 2. Sort background lanterns by depth (z)
+        lanterns.sort((a, b) => a.z - b.z);
+
+        // 3. Update & render each background lantern
+        for (let i = lanterns.length - 1; i >= 0; i--) {
+          const lt = lanterns[i];
+          lt.y += lt.vy;
+          lt.x += lt.vx + Math.sin(lt.tw) * 0.45;
+          lt.tw += lt.wspd;
+          lt.tilt = Math.sin(lt.tw) * 0.08 + lt.vx * 0.08;
+
+          // Shrink very slowly as it ascends into upper atmosphere
+          lt.size = Math.max(5, lt.size * 0.9995);
+
+          // Chance to spawn small glowing ember trailing below lantern burner
+          if (lt.size > 18 && Math.random() < 0.05) {
+            lanternEmbers.push({
+              x: lt.x + (Math.random() - 0.5) * (lt.size * 0.3),
+              y: lt.y + lt.size * 0.65,
+              vx: (Math.random() - 0.5) * 0.4,
+              vy: Math.random() * 0.8 + 0.3,
+              r: Math.random() * 1.5 + 0.8,
+              life: 1.0,
+              decay: Math.random() * 0.03 + 0.02
+            });
+          }
+
+          drawRealisticLantern(xLant, lt);
+
+          if (lt.y < -lt.size * 2) {
+            lanterns.splice(i, 1);
+          }
+        }
+
+        // 4. Update and render the Last Lantern (Approaching / Hovering / Opening)
+        if (lastLantern) {
+          if (lastLanternState === 'APPROACHING') {
+            const elapsed = Date.now() - lastLanternStartTime;
+            const duration = 5200; // 5.2 seconds smooth cinematic approach
+            const progress = Math.min(1.0, elapsed / duration);
+            const ease = 1 - Math.pow(1 - progress, 3); // Smooth cubic ease-out
+
+            lastLantern.tw += 0.03;
+            lastLantern.tilt = Math.sin(lastLantern.tw) * 0.045;
+            lastLantern.x = lastLantern.startX + (lastLantern.targetX - lastLantern.startX) * ease + Math.sin(lastLantern.tw) * 10;
+            lastLantern.y = lastLantern.startY + (lastLantern.targetY - lastLantern.startY) * ease + Math.cos(lastLantern.tw * 0.7) * 6;
+            lastLantern.size = lastLantern.startSize + (lastLantern.targetSize - lastLantern.startSize) * ease;
+            lastLantern.alpha = Math.min(1.0, 0.2 + 0.8 * ease);
+
+            // Golden spark trail as it approaches
+            if (Math.random() < 0.4) {
+              lanternEmbers.push({
+                x: lastLantern.x + (Math.random() - 0.5) * (lastLantern.size * 0.45),
+                y: lastLantern.y + lastLantern.size * 0.65,
+                vx: (Math.random() - 0.5) * 0.8,
+                vy: Math.random() * 0.8 + 0.3,
+                r: Math.random() * 2.5 + 1.2,
+                life: 1.0,
+                decay: Math.random() * 0.02 + 0.015
+              });
+            }
+
+            if (progress >= 1.0) {
+              lastLanternState = 'HOVERING';
+              $('lantern-tap-prompt').classList.add('show');
+              $('timeline-pill').textContent = '';
+              // Auto open fallback after 6s
+              lastLanternAutoOpenTimer = setTimeout(() => {
+                openLetterFromLantern();
+              }, 6000);
+            }
+          } else if (lastLanternState === 'HOVERING') {
+            lastLantern.tw += 0.032;
+            lastLantern.tilt = Math.sin(lastLantern.tw) * 0.04;
+            lastLantern.x = lastLantern.targetX + Math.sin(lastLantern.tw) * 8;
+            lastLantern.y = lastLantern.targetY + Math.cos(lastLantern.tw * 0.8) * 8;
+
+            if (Math.random() < 0.3) {
+              lanternEmbers.push({
+                x: lastLantern.x + (Math.random() - 0.5) * (lastLantern.size * 0.5),
+                y: lastLantern.y + lastLantern.size * 0.6,
+                vx: (Math.random() - 0.5) * 0.7,
+                vy: Math.random() * 0.7 + 0.3,
+                r: Math.random() * 2.5 + 1,
+                life: 1.0,
+                decay: Math.random() * 0.02 + 0.015
+              });
+            }
+          } else if (lastLanternState === 'OPENING') {
+            lastLantern.size *= 1.05;
+            lastLantern.alpha *= 0.86;
+            if (lastLantern.alpha < 0.02) {
+              lastLantern = null;
+              lastLanternState = 'OPENED';
+            }
+          }
+
+          if (lastLantern) {
+            drawRealisticLantern(xLant, lastLantern);
+          }
+        }
+
+        // 5. Draw Lantern Burst Particles (when opening)
+        for (let i = lanternBurstParticles.length - 1; i >= 0; i--) {
+          const p = lanternBurstParticles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vx *= 0.96;
+          p.vy *= 0.96;
+          p.life -= p.decay;
+          if (p.life <= 0) {
+            lanternBurstParticles.splice(i, 1);
+            continue;
+          }
+          xLant.save();
+          xLant.globalAlpha = p.life;
+          if (p.isHeart) {
+            xLant.font = `${Math.floor(p.size * p.life)}px sans-serif`;
+            xLant.fillText('❤️', p.x, p.y);
+          } else {
+            xLant.beginPath();
+            xLant.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+            xLant.fillStyle = p.color;
+            xLant.shadowColor = '#fde047';
+            xLant.shadowBlur = 8;
+            xLant.fill();
+          }
+          xLant.restore();
+        }
+      }
+
+      function drawRealisticLantern(ctx, lt) {
+        const { x, y, size, tilt, alpha, isSpecial } = lt;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(tilt);
+        ctx.globalAlpha = alpha;
+
+        const w = size;
+        const h = size * 1.35;
+        const hw = w * 0.5;
+        const hh = h * 0.5;
+
+        // 1. Soft atmospheric light halo (warm inverse-square glow)
+        const haloR = size * (isSpecial ? 3.8 : 2.5);
+        const haloGrad = ctx.createRadialGradient(0, hh * 0.25, size * 0.15, 0, hh * 0.25, haloR);
+        if (isSpecial) {
+          haloGrad.addColorStop(0, 'rgba(254, 240, 138, 0.7)');
+          haloGrad.addColorStop(0.35, 'rgba(251, 191, 36, 0.45)');
+          haloGrad.addColorStop(0.7, 'rgba(236, 72, 153, 0.2)');
+          haloGrad.addColorStop(1, 'transparent');
+        } else {
+          haloGrad.addColorStop(0, 'rgba(251, 191, 36, 0.42)');
+          haloGrad.addColorStop(0.45, 'rgba(245, 158, 11, 0.18)');
+          haloGrad.addColorStop(1, 'transparent');
+        }
+        ctx.fillStyle = haloGrad;
+        ctx.beginPath();
+        ctx.arc(0, hh * 0.25, haloR, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 2. Authentic Khom Loi Paper Canopy Silhouette
+        ctx.beginPath();
+        ctx.moveTo(-hw * 0.55, hh);
+        ctx.bezierCurveTo(-hw * 0.65, hh * 0.3, -hw * 1.05, -hh * 0.2, -hw * 0.75, -hh * 0.85);
+        ctx.bezierCurveTo(-hw * 0.4, -hh * 1.05, hw * 0.4, -hh * 1.05, hw * 0.75, -hh * 0.85);
+        ctx.bezierCurveTo(hw * 1.05, -hh * 0.2, hw * 0.65, hh * 0.3, hw * 0.55, hh);
+        ctx.bezierCurveTo(hw * 0.3, hh + 2, -hw * 0.3, hh + 2, -hw * 0.55, hh);
+        ctx.closePath();
+
+        // 3. Realistic Translucent Rice Paper Gradient
+        const paperGrad = ctx.createRadialGradient(0, hh * 0.6, 2, 0, 0, h * 0.85);
+        if (isSpecial) {
+          paperGrad.addColorStop(0, '#ffffff');
+          paperGrad.addColorStop(0.18, '#fef08a');
+          paperGrad.addColorStop(0.48, '#f472b6');
+          paperGrad.addColorStop(0.8, '#c084fc');
+          paperGrad.addColorStop(1, '#6b21a8');
+        } else {
+          paperGrad.addColorStop(0, '#fffbeb');
+          paperGrad.addColorStop(0.14, '#fef08a');
+          paperGrad.addColorStop(0.45, '#f59e0b');
+          paperGrad.addColorStop(0.78, '#d97706');
+          paperGrad.addColorStop(1, '#9a3412');
+        }
+        ctx.fillStyle = paperGrad;
+        ctx.fill();
+
+        // 4. Subtle Bamboo Rib Creases
+        if (size > 13) {
+          ctx.strokeStyle = isSpecial ? 'rgba(107, 33, 168, 0.28)' : 'rgba(120, 53, 15, 0.25)';
+          ctx.lineWidth = Math.max(0.6, size * 0.028);
+
+          ctx.beginPath();
+          ctx.moveTo(0, -hh * 0.95);
+          ctx.lineTo(0, hh);
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(-hw * 0.35, -hh * 0.9);
+          ctx.quadraticCurveTo(-hw * 0.45, 0, -hw * 0.25, hh);
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(hw * 0.35, -hh * 0.9);
+          ctx.quadraticCurveTo(hw * 0.45, 0, hw * 0.25, hh);
+          ctx.stroke();
+        }
+
+        // 5. Dark Bamboo Hoop Rim at the bottom
+        ctx.beginPath();
+        ctx.ellipse(0, hh, hw * 0.55, Math.max(1.5, size * 0.08), 0, 0, Math.PI * 2);
+        ctx.strokeStyle = isSpecial ? 'rgba(76, 29, 149, 0.85)' : 'rgba(67, 20, 7, 0.8)';
+        ctx.lineWidth = Math.max(1, size * 0.045);
+        ctx.stroke();
+        ctx.fillStyle = isSpecial ? 'rgba(46, 16, 101, 0.4)' : 'rgba(40, 10, 5, 0.4)';
+        ctx.fill();
+
+        // 6. Flickering Candle/Burner Flame
+        const flameJitterX = (Math.random() - 0.5) * 1.5;
+        const flameJitterY = (Math.random() - 0.5) * 1.5;
+        const flameH = Math.max(3, size * 0.26);
+        const flameW = Math.max(2, size * 0.14);
+
+        ctx.beginPath();
+        ctx.moveTo(flameJitterX, hh - flameH + flameJitterY);
+        ctx.bezierCurveTo(flameJitterX + flameW, hh - flameH * 0.3, flameJitterX + flameW * 0.8, hh, flameJitterX, hh);
+        ctx.bezierCurveTo(flameJitterX - flameW * 0.8, hh, flameJitterX - flameW, hh - flameH * 0.3, flameJitterX, hh - flameH + flameJitterY);
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = '#fbbf24';
+        ctx.shadowBlur = size * 0.4;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // 7. Special Lantern Wax Seal & Letter Heart Emblem
+        if (isSpecial) {
+          const sealR = size * 0.22;
+          const sealY = -hh * 0.08;
+
+          ctx.save();
+          ctx.shadowColor = 'rgba(253, 224, 71, 0.9)';
+          ctx.shadowBlur = 15;
+
+          const sealGrad = ctx.createRadialGradient(0, sealY, 2, 0, sealY, sealR);
+          sealGrad.addColorStop(0, '#fef08a');
+          sealGrad.addColorStop(0.5, '#f59e0b');
+          sealGrad.addColorStop(1, '#b45309');
+          ctx.fillStyle = sealGrad;
+          ctx.beginPath();
+          ctx.arc(0, sealY, sealR, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+          ctx.lineWidth = Math.max(1, size * 0.02);
+          ctx.stroke();
+
+          // Envelope / Heart Icon
+          ctx.font = `${Math.floor(sealR * 1.1)}px sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('💌', 0, sealY);
+
+          if (size > 90) {
+            ctx.font = `600 ${Math.floor(size * 0.075)}px 'Cinzel', serif`;
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowColor = '#000000';
+            ctx.shadowBlur = 6;
+            ctx.fillText('FOR MY LOVE ❤️', 0, sealY + sealR + 14);
+            ctx.font = `italic ${Math.floor(size * 0.065)}px 'Playfair Display', serif`;
+            ctx.fillStyle = '#fef08a';
+            ctx.fillText('', 0, sealY + sealR + 28);
+          }
+          ctx.restore();
+        }
+
+        ctx.restore();
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         STAGE 4: SURAT CINTA DARI LAMPION TERAKHIR
+      ═══════════════════════════════════════════════════════════════ */
+      window.openLetterFromLantern = function () {
+        if (lastLanternOpened) return;
+        lastLanternOpened = true;
+        clearTimeout(lastLanternAutoOpenTimer);
+
+        $('lantern-tap-prompt').classList.remove('show');
+        hideStory();
+
+        // Spawn radiant burst particles around the lantern
+        if (lastLantern) {
+          for (let i = 0; i < 45; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const spd = Math.random() * 6 + 2;
+            lanternBurstParticles.push({
+              x: lastLantern.x,
+              y: lastLantern.y,
+              vx: Math.cos(angle) * spd,
+              vy: Math.sin(angle) * spd,
+              size: Math.random() * 5 + 3,
+              color: ['#fef08a', '#facc15', '#f472b6', '#e879f9', '#ffffff'][i % 5],
+              life: 1.0,
+              decay: Math.random() * 0.025 + 0.015,
+              isHeart: i % 6 === 0
+            });
+          }
+        }
+
+        lastLanternState = 'OPENING';
+
+        // Open letter modal with smooth expansion from lantern center
+        setTimeout(() => {
+          openLetterStage();
+        }, 300);
+      };
+
+      function openLetterStage() {
+        currentStage = 'LETTER';
+        $('timeline-pill').textContent = '💌 Pesan dari Lampion Terakhir';
+        $('letter-modal').classList.add('show');
+
+        // Typewriter sequential fade in for paragraphs
+        ['lp1', 'lp2', 'lp3', 'lp4', 'lpsig'].forEach((id, i) => {
+          const el = $(id);
+          if (el) {
+            el.classList.remove('show');
+            setTimeout(() => {
+              el.classList.add('show');
+            }, 500 + i * 750);
+          }
+        });
+      }
+
+      // Tapping anywhere on screen when last lantern is hovering opens the letter
+      app.addEventListener('click', () => {
+        if (lastLanternState === 'HOVERING') {
+          openLetterFromLantern();
+        }
+      });
+
+      /* ═══════════════════════════════════════════════════════════════
+         STAGE 5: ENDING — KONSTELASI HATI & I LOVE YOU CLARA (PRESERVED)
+      ═══════════════════════════════════════════════════════════════ */
+      let heartParticles = [];
+      let petals = [];
+
+      window.finishLetterToEnding = function () {
+        $('letter-modal').classList.remove('show');
+        currentStage = 'ENDING';
+        $('timeline-pill').textContent = 'SPECIAL FOR MY PRETTY GF 👸🏻';
+
+        // Clear lanterns and spawn constellation heart
+        lanterns = [];
+        lastLantern = null;
+        lastLanternState = 'OPENED';
+        buildHeartConstellation();
+        initPetals();
+
+        setTimeout(() => {
+          $('ending-wrap').classList.add('show');
+        }, 1200);
+      };
+
+      function buildHeartConstellation() {
+        heartParticles = [];
+        const count = 38;
+        const centerX = W * 0.5;
+        const centerY = H * 0.38;
+        const scale = Math.min(W, H) * 0.016;
+
+        for (let i = 0; i < count; i++) {
+          const t = (i / count) * Math.PI * 2;
+          // Parametric heart formula
+          const hx = 16 * Math.pow(Math.sin(t), 3);
+          const hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+
+          heartParticles.push({
+            targetX: centerX + hx * scale,
+            targetY: centerY + hy * scale,
+            x: centerX + (Math.random() - 0.5) * W,
+            y: H + Math.random() * 100,
+            r: Math.random() * 3 + 4,
+            tw: Math.random() * Math.PI * 2,
+            color: ['#f472b6', '#e879f9', '#facc15', '#38bdf8'][i % 4]
+          });
+        }
+      }
+
+      function drawEndingConstellation() {
+        if (currentStage !== 'ENDING') return;
+        xEnd.clearRect(0, 0, W, H);
+
+        // Animate particles moving to form the Heart
+        heartParticles.forEach((p, idx) => {
+          p.x += (p.targetX - p.x) * 0.045;
+          p.y += (p.targetY - p.y) * 0.045;
+          p.tw += 0.03;
+
+          // Connect lines to next particle
+          if (idx > 0) {
+            const prev = heartParticles[idx - 1];
+            xEnd.beginPath();
+            xEnd.moveTo(prev.x, prev.y);
+            xEnd.lineTo(p.x, p.y);
+            xEnd.strokeStyle = 'rgba(232,121,249,0.35)';
+            xEnd.lineWidth = 1.5;
+            xEnd.stroke();
+          }
+
+          // Star / lantern node glow
+          const g = xEnd.createRadialGradient(p.x, p.y, 0, p.x, p.y, 16);
+          g.addColorStop(0, p.color);
+          g.addColorStop(0.5, 'rgba(232,121,249,0.3)');
+          g.addColorStop(1, 'transparent');
+          xEnd.fillStyle = g;
+          xEnd.beginPath(); xEnd.arc(p.x, p.y, 16, 0, Math.PI * 2); xEnd.fill();
+
+          // Center bright star
+          xEnd.beginPath(); xEnd.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
+          xEnd.fillStyle = '#ffffff'; xEnd.fill();
+        });
+
+        // Close the loop
+        if (heartParticles.length > 2) {
+          const pFirst = heartParticles[0];
+          const pLast = heartParticles[heartParticles.length - 1];
+          xEnd.beginPath();
+          xEnd.moveTo(pLast.x, pLast.y);
+          xEnd.lineTo(pFirst.x, pFirst.y);
+          xEnd.strokeStyle = 'rgba(232,121,249,0.35)';
+          xEnd.lineWidth = 1.5;
+          xEnd.stroke();
+        }
+      }
+
+      function initPetals() {
+        petals = Array.from({ length: 45 }, () => ({
+          x: Math.random() * W,
+          y: -20 - Math.random() * H,
+          size: Math.random() * 4 + 3,
+          vy: Math.random() * 1.2 + 0.8,
+          vx: (Math.random() - 0.5) * 0.8,
+          tw: Math.random() * Math.PI * 2,
+          wspd: Math.random() * 0.03 + 0.015
+        }));
+      }
+
+      function drawPetals() {
+        if (currentStage !== 'ENDING') return;
+        xPetals.clearRect(0, 0, W, H);
+
+        petals.forEach(pt => {
+          pt.y += pt.vy;
+          pt.x += pt.vx + Math.sin(pt.tw) * 0.5;
+          pt.tw += pt.wspd;
+          if (pt.y > H + 20) { pt.y = -10; pt.x = Math.random() * W; }
+
+          xPetals.save();
+          xPetals.translate(pt.x, pt.y);
+          xPetals.rotate(pt.tw);
+          xPetals.fillStyle = 'rgba(244,114,182,0.65)';
+          xPetals.beginPath();
+          xPetals.ellipse(0, 0, pt.size, pt.size * 1.6, 0, 0, Math.PI * 2);
+          xPetals.fill();
+          xPetals.restore();
+        });
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         STAGE 6: REPLAY ALL
+      ═══════════════════════════════════════════════════════════════ */
+      window.replayAll = function () {
+        $('ending-wrap').classList.remove('show');
+        $('letter-modal').classList.remove('show');
+        $('lantern-tap-prompt').classList.remove('show');
+        clearTimeout(lastLanternAutoOpenTimer);
+        clearInterval(lanternSpawnInterval);
+        lanternStoryTimeouts.forEach(t => clearTimeout(t));
+        lanternStoryTimeouts = [];
+        lastLantern = null;
+        lastLanternState = 'IDLE';
+        lastLanternOpened = false;
+        lanterns = [];
+        lanternEmbers = [];
+        lanternBurstParticles = [];
+        heartParticles = [];
+        petals = [];
+        xLant.clearRect(0, 0, W, H);
+        xEnd.clearRect(0, 0, W, H);
+        xPetals.clearRect(0, 0, W, H);
+
+        ['lp1', 'lp2', 'lp3', 'lp4', 'lpsig'].forEach(id => {
+          const el = $(id);
+          if (el) el.classList.remove('show');
+        });
+
+        startExperience();
+      };
+
+      /* ═══════════════════════════════════════════════════════════════
+         REALISTIC AURORA BOREALIS (Curtain Drapes with Vertical Ray Pleats)
+      ═══════════════════════════════════════════════════════════════ */
+      let aurTime = 0;
+      const AURORA_DRAPES = [
+        {
+          baseAlt: 0.26, hMax: 200, speed: 0.0028,
+          freq: 0.0026, harm: 0.0062, amp1: 50, amp2: 26,
+          pleatFreq: 0.016, pleatSpeed: 0.006,
+          cBottom: [52, 211, 153, 0.42], // Emerald #34d399
+          cMid: [56, 189, 248, 0.32], // Cyan #38bdf8
+          cTop: [192, 132, 252, 0.22],// Violet #c084fc
+          step: 4
+        },
+        {
+          baseAlt: 0.20, hMax: 240, speed: 0.0022,
+          freq: 0.0019, harm: 0.0048, amp1: 60, amp2: 32,
+          pleatFreq: 0.013, pleatSpeed: -0.005,
+          cBottom: [74, 222, 128, 0.36], // Mint green #4ade80
+          cMid: [232, 121, 249, 0.38],// Vivid magenta #e879f9
+          cTop: [244, 114, 182, 0.28],// Rose #f472b6
+          step: 4
+        },
+        {
+          baseAlt: 0.14, hMax: 270, speed: 0.0015,
+          freq: 0.0013, harm: 0.0034, amp1: 40, amp2: 20,
+          pleatFreq: 0.010, pleatSpeed: 0.003,
+          cBottom: [168, 85, 247, 0.26], // Purple #a855f7
+          cMid: [217, 70, 239, 0.22], // Magenta #d946ef
+          cTop: [147, 51, 234, 0.16], // Deep violet #9333ea
+          step: 5
+        }
+      ];
+
+      function drawAurora() {
+        xAur.clearRect(0, 0, W, H);
+
+        // Realistic deep starry sky gradient
+        const sky = xAur.createLinearGradient(0, 0, 0, H);
+        sky.addColorStop(0, '#020108');
+        sky.addColorStop(0.35, '#060314');
+        sky.addColorStop(0.68, '#0e0828');
+        sky.addColorStop(0.88, '#160b36');
+        sky.addColorStop(1, '#080312');
+        xAur.fillStyle = sky;
+        xAur.fillRect(0, 0, W, H);
+
+        aurTime += 0.008;
+
+        xAur.save();
+        xAur.globalCompositeOperation = 'lighter'; // Additive plasma blending for realistic aurora glow
+
+        AURORA_DRAPES.forEach(dr => {
+          const baseY = H * dr.baseAlt;
+          const step = dr.step;
+          const rayH = Math.min(dr.hMax, H * 0.46);
+
+          for (let x = 0; x <= W + step; x += step) {
+            // Wave curve with harmonics
+            const wave = Math.sin(x * dr.freq + aurTime * dr.speed * 100) * dr.amp1
+              + Math.cos(x * dr.harm - aurTime * dr.speed * 75) * dr.amp2;
+            const cy = baseY + wave;
+
+            // Vertical ray pleat modulation (creates the realistic curtain folds)
+            const pleat = Math.sin(x * dr.pleatFreq + aurTime * dr.pleatSpeed * 50)
+              * Math.cos(x * 0.032 - aurTime * 0.012);
+            const intensity = Math.max(0.12, 0.62 + 0.38 * pleat);
+
+            // Height variation along curtain folds
+            const hCur = rayH * (0.75 + 0.35 * Math.sin(x * 0.004 + aurTime * 0.01));
+            const topY = cy - hCur;
+
+            const [r1, g1, b1, a1] = dr.cBottom;
+            const [r2, g2, b2, a2] = dr.cMid;
+            const [r3, g3, b3, a3] = dr.cTop;
+
+            const grad = xAur.createLinearGradient(x, cy, x, topY);
+            grad.addColorStop(0, `rgba(${r1},${g1},${b1},${a1 * intensity})`);
+            grad.addColorStop(0.32, `rgba(${r2},${g2},${b2},${a2 * intensity})`);
+            grad.addColorStop(0.72, `rgba(${r3},${g3},${b3},${a3 * intensity * 0.75})`);
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+            xAur.fillStyle = grad;
+            xAur.fillRect(x - step * 0.5, topY, step + 1.2, hCur);
+          }
+        });
+
+        xAur.restore();
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         STARS & SHOOTING STARS
+      ═══════════════════════════════════════════════════════════════ */
+      const STARS = Array.from({ length: 280 }, () => ({
+        x: Math.random(), y: Math.random() * 0.75,
+        r: Math.random() * 1.4 + 0.3,
+        tw: Math.random() * Math.PI * 2, spd: Math.random() * 0.03 + 0.008,
+        color: Math.random() > 0.4 ? '#fff' : (Math.random() > 0.5 ? '#f5d0fe' : '#bae6fd')
+      }));
+
+      let shootingStars = [];
+      function addShootingStar() {
+        shootingStars.push({
+          x: Math.random() * W * 0.8, y: Math.random() * H * 0.35,
+          len: Math.random() * 90 + 70, speed: Math.random() * 8 + 6,
+          angle: (Math.random() * 15 + 35) * Math.PI / 180,
+          life: 1.0, decay: 0.02
+        });
+      }
+
+      function drawStars() {
+        xStars.clearRect(0, 0, W, H);
+        STARS.forEach(s => {
+          s.tw += s.spd;
+          const alpha = 0.4 + 0.6 * Math.sin(s.tw);
+          xStars.beginPath();
+          xStars.arc(s.x * W, s.y * H, s.r, 0, Math.PI * 2);
+          xStars.fillStyle = s.color;
+          xStars.globalAlpha = Math.max(0, alpha);
+          xStars.fill();
+          xStars.globalAlpha = 1;
+        });
+
+        if (Math.random() < 0.015 && shootingStars.length < 2) addShootingStar();
+        shootingStars.forEach((st, idx) => {
+          st.x += Math.cos(st.angle) * st.speed;
+          st.y += Math.sin(st.angle) * st.speed;
+          st.life -= st.decay;
+
+          const tailX = st.x - Math.cos(st.angle) * st.len;
+          const tailY = st.y - Math.sin(st.angle) * st.len;
+          const sg = xStars.createLinearGradient(tailX, tailY, st.x, st.y);
+          sg.addColorStop(0, 'transparent');
+          sg.addColorStop(1, `rgba(245,208,254,${st.life})`);
+
+          xStars.beginPath();
+          xStars.moveTo(tailX, tailY);
+          xStars.lineTo(st.x, st.y);
+          xStars.strokeStyle = sg;
+          xStars.lineWidth = 2;
+          xStars.stroke();
+
+          xStars.beginPath();
+          xStars.arc(st.x, st.y, 2.5, 0, Math.PI * 2);
+          xStars.fillStyle = `rgba(255,255,255,${st.life})`;
+          xStars.fill();
+
+          if (st.life <= 0) shootingStars.splice(idx, 1);
+        });
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         REALISTIC PROCEDURAL MOUNTAIN SYSTEM (Mahameru Summit, 3D Arête & Lautan Awan)
+      ═══════════════════════════════════════════════════════════════ */
+      function pseudoNoise(x) {
+        const i = Math.floor(x);
+        const f = x - i;
+        const s = f * f * (3 - 2 * f);
+        const n0 = Math.sin(i * 127.1 + 311.7) * 43758.5453123;
+        const n1 = Math.sin((i + 1) * 127.1 + 311.7) * 43758.5453123;
+        return (n0 - Math.floor(n0)) * (1 - s) + (n1 - Math.floor(n1)) * s;
+      }
+
+      function fbm(x, octaves = 4) {
+        let total = 0, amp = 1.0, freq = 1.0, max = 0;
+        for (let i = 0; i < octaves; i++) {
+          total += pseudoNoise(x * freq) * amp;
+          max += amp;
+          freq *= 2.15;
+          amp *= 0.48;
+        }
+        return total / max;
+      }
+
+      let farPeaks = [], midHills = [], heroRidge = [], foreLedge = [];
+      let heroPeak = { x: 0, y: 0, idx: 0 };
+      let heroSpine = [];
+      let snowCapLit = [], snowCapShadow = [];
+      let pineTrees = [];
+      let coupleOverlook = { x: 0, y: 0 };
+      let fogOffset = 0;
+      let coneStartIdx = 0, coneEndIdx = 0;
+
+      function buildMountainGeometry() {
+        farPeaks = [];
+        midHills = [];
+        heroRidge = [];
+        foreLedge = [];
+        heroSpine = [];
+        snowCapLit = [];
+        snowCapShadow = [];
+        pineTrees = [];
+
+        const ptsCount = Math.ceil(W / 2) + 2;
+
+        // ── 1. LAYER 1: DISTANT ALPINE RANGE (Jagged Mountain Horizon) ──
+        for (let i = 0; i <= ptsCount; i++) {
+          const x = i * 2;
+          const nx = x / W;
+          // Majestic peaks visible across the horizon
+          const p1 = Math.exp(-Math.pow((nx - 0.12) / 0.07, 2)) * (H * 0.22);
+          const p2 = Math.exp(-Math.pow((nx - 0.26) / 0.08, 2)) * (H * 0.18);
+          const p3 = Math.exp(-Math.pow((nx - 0.48) / 0.10, 2)) * (H * 0.14);
+          const p4 = Math.exp(-Math.pow((nx - 0.72) / 0.08, 2)) * (H * 0.23);
+          const p5 = Math.exp(-Math.pow((nx - 0.88) / 0.07, 2)) * (H * 0.20);
+          const rock = (fbm(nx * 22.0 + 3.1, 4) - 0.4) * (H * 0.05);
+          const y = H * 0.65 - (p1 + p2 + p3 + p4 + p5) + rock;
+          farPeaks.push({ x, y });
+        }
+
+        // ── 2. LAYER 2: MID-DISTANCE ROLLING FOOTHILLS ──
+        for (let i = 0; i <= ptsCount; i++) {
+          const x = i * 2;
+          const nx = x / W;
+          const h1 = Math.exp(-Math.pow((nx - 0.20) / 0.14, 2)) * (H * 0.12);
+          const h2 = Math.exp(-Math.pow((nx - 0.82) / 0.15, 2)) * (H * 0.13);
+          const crag = (fbm(nx * 14.0 + 7.4, 4) - 0.5) * (H * 0.04);
+          const y = H * 0.74 - (h1 + h2) + crag;
+          midHills.push({ x, y });
+        }
+
+        // ── 3. LAYER 3: THE HERO SUMMIT (MAHAMERU · Iconic Towering Stratovolcano) ──
+        const peakCenter = 0.515;
+        const peakSpan = Math.min(0.38, Math.max(0.28, (H * 0.65) / W));
+        const heroHeight = Math.min(H * 0.48, Math.max(H * 0.38, W * 0.36));
+        const heroBaseY = H * 0.77;
+
+        let minY = Infinity;
+        let peakIdx = 0;
+
+        for (let i = 0; i <= ptsCount; i++) {
+          const x = i * 2;
+          const nx = x / W;
+          const dx = Math.abs(nx - peakCenter);
+
+          let coneElev = 0;
+          const inCone = dx < peakSpan;
+          if (inCone) {
+            // Realistic alpine volcano profile with sweeping concave foothills
+            const coneProfile = Math.pow(1.0 - Math.pow(dx / peakSpan, 1.32), 1.25);
+            coneElev = coneProfile * heroHeight;
+          }
+
+          const rockDetail = inCone
+            ? (fbm(nx * 28.0 + 1.5, 4) - 0.45) * (H * 0.035) + (pseudoNoise(nx * 65.0) - 0.5) * 3
+            : 0;
+
+          const y = heroBaseY - coneElev + rockDetail;
+          heroRidge.push({ x, y, nx, inCone });
+
+          if (y < minY) {
+            minY = y;
+            peakIdx = i;
+          }
+        }
+
+        heroPeak = { x: heroRidge[peakIdx].x, y: heroRidge[peakIdx].y, idx: peakIdx };
+
+        // Find boundaries of the volcano cone
+        coneStartIdx = heroRidge.findIndex(p => p.inCone);
+        coneEndIdx = heroRidge.length - 1;
+        for (let i = heroRidge.length - 1; i >= 0; i--) {
+          if (heroRidge[i].inCone) { coneEndIdx = i; break; }
+        }
+
+        // ── 4. ARÊTE (Central Knife-Edge Spine dividing Lit & Shadow Faces) ──
+        const spineSteps = 35;
+        const spineBaseX = heroPeak.x - (heroPeak.x - heroRidge[coneStartIdx].x) * 0.22;
+        for (let s = 0; s <= spineSteps; s++) {
+          const t = s / spineSteps;
+          const sy = heroPeak.y + (heroBaseY - heroPeak.y) * t;
+          const naturalMeander = Math.sin(t * Math.PI * 1.5) * (W * 0.018)
+            + (pseudoNoise(t * 8.0) - 0.5) * (W * 0.010);
+          const sx = heroPeak.x + (spineBaseX - heroPeak.x) * t + naturalMeander;
+          heroSpine.push({ x: sx, y: sy, t });
+        }
+
+        // ── 5. NATURAL GLACIAL SNOW CAP ON THE SUMMIT CROWN ──
+        const snowRadiusNx = peakSpan * 0.32;
+        const snowStartIdx = Math.max(coneStartIdx, Math.floor(((peakCenter - snowRadiusNx) * W) / 2));
+        const snowEndIdx = Math.min(coneEndIdx, Math.ceil(((peakCenter + snowRadiusNx) * W) / 2));
+
+        // Lit snow cap polygon (with natural jagged snow tongue crevasses)
+        snowCapLit = [];
+        for (let i = snowStartIdx; i <= peakIdx; i++) {
+          snowCapLit.push({ x: heroRidge[i].x, y: heroRidge[i].y });
+        }
+        for (let i = peakIdx; i >= snowStartIdx; i--) {
+          const p = heroRidge[i];
+          const normDist = Math.abs(p.nx - peakCenter) / snowRadiusNx;
+          // Natural ravines dipping into the rock
+          const crevasseDip = Math.sin(p.x * 0.12) > 0.4 ? (H * 0.04) : 0;
+          const depth = (heroHeight * 0.24) * Math.max(0, 1.0 - Math.pow(normDist, 1.35))
+            * (0.75 + 0.35 * pseudoNoise(p.x * 0.09)) + crevasseDip;
+          snowCapLit.push({ x: p.x, y: Math.min(heroBaseY, p.y + depth) });
+        }
+
+        // Shadow snow cap polygon
+        snowCapShadow = [];
+        for (let i = peakIdx; i <= snowEndIdx; i++) {
+          snowCapShadow.push({ x: heroRidge[i].x, y: heroRidge[i].y });
+        }
+        for (let i = snowEndIdx; i >= peakIdx; i--) {
+          const p = heroRidge[i];
+          const normDist = Math.abs(p.nx - peakCenter) / snowRadiusNx;
+          const crevasseDip = Math.sin(p.x * 0.12) > 0.4 ? (H * 0.035) : 0;
+          const depth = (heroHeight * 0.24) * Math.max(0, 1.0 - Math.pow(normDist, 1.35))
+            * (0.75 + 0.35 * pseudoNoise(p.x * 0.09)) + crevasseDip;
+          snowCapShadow.push({ x: p.x, y: Math.min(heroBaseY, p.y + depth) });
+        }
+
+        // ── 6. FOREGROUND SUMMIT ROCKY LEDGE (Mahameru 4.095 mdpl Overlook) ──
+        for (let i = 0; i <= ptsCount; i++) {
+          const x = i * 2;
+          const nx = x / W;
+          const cliffSlope = (nx - 0.5) * (H * 0.02);
+          const crags = (fbm(nx * 14.0 + 6.3, 4) - 0.5) * (H * 0.025);
+          const y = H * 0.88 + cliffSlope + crags;
+          foreLedge.push({ x, y });
+        }
+
+        const coupleTargetX = W * 0.28;
+        const coupleIdx = Math.min(foreLedge.length - 1, Math.max(0, Math.floor(coupleTargetX / 2)));
+        coupleOverlook = {
+          x: coupleTargetX,
+          y: foreLedge[coupleIdx] ? foreLedge[coupleIdx].y - 2 : H * 0.87
+        };
+
+        // ── 7. ALPINE PINE TREES (Framing sides) ──
+        pineTrees = [
+          { x: W * 0.035, y: getForeY(W * 0.035), h: H * 0.24, w: Math.min(68, W * 0.08) },
+          { x: W * 0.085, y: getForeY(W * 0.085), h: H * 0.17, w: Math.min(52, W * 0.065) },
+          { x: W * 0.14, y: getForeY(W * 0.14), h: H * 0.12, w: Math.min(38, W * 0.05) },
+          { x: W * 0.915, y: getForeY(W * 0.915), h: H * 0.15, w: Math.min(48, W * 0.06) },
+          { x: W * 0.965, y: getForeY(W * 0.965), h: H * 0.22, w: Math.min(62, W * 0.078) }
+        ];
+      }
+
+      function getForeY(x) {
+        const idx = Math.min(foreLedge.length - 1, Math.max(0, Math.floor(x / 2)));
+        return foreLedge[idx] ? foreLedge[idx].y : H * 0.88;
+      }
+
+      function drawMountains() {
+        xMnt.clearRect(0, 0, W, H);
+
+        // ══════════════════════════════════════════════════════════
+        // LAYER 1: DISTANT ALPINE RANGE (Moonlit Haze Horizon)
+        // ══════════════════════════════════════════════════════════
+        if (farPeaks.length > 1) {
+          xMnt.save();
+          xMnt.beginPath();
+          xMnt.moveTo(0, H);
+          farPeaks.forEach(p => xMnt.lineTo(p.x, p.y));
+          xMnt.lineTo(W, H);
+          xMnt.closePath();
+
+          const farGrad = xMnt.createLinearGradient(0, H * 0.38, 0, H);
+          farGrad.addColorStop(0, '#1c1038');
+          farGrad.addColorStop(0.55, '#110722');
+          farGrad.addColorStop(1, '#080314');
+          xMnt.fillStyle = farGrad;
+          xMnt.fill();
+
+          xMnt.strokeStyle = 'rgba(216, 180, 254, 0.35)';
+          xMnt.lineWidth = 1.3;
+          xMnt.stroke();
+          xMnt.restore();
+        }
+
+        // ══════════════════════════════════════════════════════════
+        // LAYER 2: DEEP VALLEY CLOUD INVERSION (Lautan Awan Jauh)
+        // ══════════════════════════════════════════════════════════
+        fogOffset += 0.22;
+        drawDriftingMist(H * 0.65, 55, 'rgba(147, 51, 234, 0.12)', 'rgba(56, 189, 248, 0.08)', fogOffset);
+
+        // ══════════════════════════════════════════════════════════
+        // LAYER 3: MID-DISTANCE ROLLING FOOTHILLS
+        // ══════════════════════════════════════════════════════════
+        if (midHills.length > 1) {
+          xMnt.save();
+          xMnt.beginPath();
+          xMnt.moveTo(0, H);
+          midHills.forEach(p => xMnt.lineTo(p.x, p.y));
+          xMnt.lineTo(W, H);
+          xMnt.closePath();
+
+          const midGrad = xMnt.createLinearGradient(0, H * 0.55, 0, H);
+          midGrad.addColorStop(0, '#241242');
+          midGrad.addColorStop(0.5, '#140828');
+          midGrad.addColorStop(1, '#090318');
+          xMnt.fillStyle = midGrad;
+          xMnt.fill();
+
+          xMnt.strokeStyle = 'rgba(192, 132, 252, 0.20)';
+          xMnt.lineWidth = 1.0;
+          xMnt.stroke();
+          xMnt.restore();
+        }
+
+        // ══════════════════════════════════════════════════════════
+        // LAYER 4: MID-VALLEY SEA OF CLOUDS (Lautan Awan Menengah)
+        // ══════════════════════════════════════════════════════════
+        drawDriftingMist(H * 0.73, 62, 'rgba(32, 15, 62, 0.70)', 'rgba(60, 28, 105, 0.45)', -fogOffset * 0.85);
+
+        // ══════════════════════════════════════════════════════════
+        // LAYER 5: THE HERO SUMMIT (MAHAMERU · 3D FACETS & ARÊTE)
+        // ══════════════════════════════════════════════════════════
+        if (heroRidge.length > 1 && heroSpine.length > 1) {
+          xMnt.save();
+
+          const lastSpine = heroSpine[heroSpine.length - 1];
+          const startPt = heroRidge[coneStartIdx];
+          const endPt = heroRidge[coneEndIdx];
+
+          // ── 5A. LIT FACE (Left flank facing the Aurora) ──
+          xMnt.beginPath();
+          xMnt.moveTo(startPt.x, startPt.y);
+          for (let i = coneStartIdx; i <= heroPeak.idx; i++) {
+            xMnt.lineTo(heroRidge[i].x, heroRidge[i].y);
+          }
+          for (let s = 0; s < heroSpine.length; s++) {
+            xMnt.lineTo(heroSpine[s].x, heroSpine[s].y);
+          }
+          // Follow the base naturally back to cone start
+          xMnt.lineTo(startPt.x, startPt.y);
+          xMnt.closePath();
+
+          const litGrad = xMnt.createLinearGradient(0, heroPeak.y, 0, lastSpine.y);
+          litGrad.addColorStop(0, '#3d206f');
+          litGrad.addColorStop(0.35, '#28134d');
+          litGrad.addColorStop(0.75, '#17092e');
+          litGrad.addColorStop(1, '#090318');
+          xMnt.fillStyle = litGrad;
+          xMnt.fill();
+
+          // Ambient celestial sheen reflecting aurora on lit slope
+          const sheen = xMnt.createLinearGradient(startPt.x, heroPeak.y, heroPeak.x, lastSpine.y);
+          sheen.addColorStop(0, 'rgba(168, 85, 247, 0.08)');
+          sheen.addColorStop(0.5, 'rgba(56, 189, 248, 0.05)');
+          sheen.addColorStop(1, 'transparent');
+          xMnt.fillStyle = sheen;
+          xMnt.fill();
+
+          // ── 5B. SHADOW FACE (Right flank in deep obsidian shadow) ──
+          xMnt.beginPath();
+          xMnt.moveTo(lastSpine.x, lastSpine.y);
+          for (let s = heroSpine.length - 1; s >= 0; s--) {
+            xMnt.lineTo(heroSpine[s].x, heroSpine[s].y);
+          }
+          for (let i = heroPeak.idx; i <= coneEndIdx; i++) {
+            xMnt.lineTo(heroRidge[i].x, heroRidge[i].y);
+          }
+          xMnt.lineTo(lastSpine.x, lastSpine.y);
+          xMnt.closePath();
+
+          const shadowGrad = xMnt.createLinearGradient(0, heroPeak.y, 0, lastSpine.y);
+          shadowGrad.addColorStop(0, '#190a32');
+          shadowGrad.addColorStop(0.35, '#0e041f');
+          shadowGrad.addColorStop(0.75, '#070212');
+          shadowGrad.addColorStop(1, '#030108');
+          xMnt.fillStyle = shadowGrad;
+          xMnt.fill();
+
+          // ── 5C. NATURAL GLACIAL SNOW CAP ──
+          // Lit snow cap
+          if (snowCapLit.length > 2) {
+            xMnt.save();
+            xMnt.beginPath();
+            snowCapLit.forEach((p, idx) => {
+              if (idx === 0) xMnt.moveTo(p.x, p.y);
+              else xMnt.lineTo(p.x, p.y);
+            });
+            xMnt.closePath();
+
+            const snLit = xMnt.createLinearGradient(0, heroPeak.y, 0, heroPeak.y + H * 0.14);
+            snLit.addColorStop(0, 'rgba(255, 252, 255, 0.96)');
+            snLit.addColorStop(0.35, 'rgba(244, 228, 255, 0.88)');
+            snLit.addColorStop(0.75, 'rgba(192, 132, 252, 0.45)');
+            snLit.addColorStop(1, 'rgba(147, 51, 234, 0)');
+            xMnt.fillStyle = snLit;
+            xMnt.fill();
+            xMnt.restore();
+          }
+
+          // Shadow snow cap
+          if (snowCapShadow.length > 2) {
+            xMnt.save();
+            xMnt.beginPath();
+            snowCapShadow.forEach((p, idx) => {
+              if (idx === 0) xMnt.moveTo(p.x, p.y);
+              else xMnt.lineTo(p.x, p.y);
+            });
+            xMnt.closePath();
+
+            const snShad = xMnt.createLinearGradient(0, heroPeak.y, 0, heroPeak.y + H * 0.14);
+            snShad.addColorStop(0, 'rgba(191, 219, 254, 0.70)');
+            snShad.addColorStop(0.35, 'rgba(147, 197, 253, 0.50)');
+            snShad.addColorStop(0.75, 'rgba(99, 102, 241, 0.22)');
+            snShad.addColorStop(1, 'rgba(49, 46, 129, 0)');
+            xMnt.fillStyle = snShad;
+            xMnt.fill();
+            xMnt.restore();
+          }
+
+          // ── 5D. ARÊTE RIDGE SPINE (Razor knife-edge crest separating faces) ──
+          xMnt.beginPath();
+          heroSpine.forEach((p, idx) => {
+            if (idx === 0) xMnt.moveTo(p.x, p.y);
+            else xMnt.lineTo(p.x, p.y);
+          });
+          const spineGrad = xMnt.createLinearGradient(0, heroPeak.y, 0, lastSpine.y);
+          spineGrad.addColorStop(0, 'rgba(255, 250, 255, 0.92)');
+          spineGrad.addColorStop(0.35, 'rgba(232, 121, 249, 0.55)');
+          spineGrad.addColorStop(1, 'rgba(147, 51, 234, 0.10)');
+          xMnt.strokeStyle = spineGrad;
+          xMnt.lineWidth = 2.0;
+          xMnt.stroke();
+
+          // ── 5E. SUMMIT AURORA RIM HIGHLIGHT ──
+          xMnt.beginPath();
+          for (let i = coneStartIdx; i <= coneEndIdx; i++) {
+            if (i === coneStartIdx) xMnt.moveTo(heroRidge[i].x, heroRidge[i].y);
+            else xMnt.lineTo(heroRidge[i].x, heroRidge[i].y);
+          }
+          const rimGrad = xMnt.createLinearGradient(startPt.x, 0, endPt.x, 0);
+          rimGrad.addColorStop(0, 'rgba(56, 189, 248, 0.45)');
+          rimGrad.addColorStop(0.3, 'rgba(232, 121, 249, 0.85)');
+          rimGrad.addColorStop(0.7, 'rgba(244, 114, 182, 0.75)');
+          rimGrad.addColorStop(1, 'rgba(52, 211, 153, 0.40)');
+          xMnt.strokeStyle = rimGrad;
+          xMnt.lineWidth = 2.0;
+          xMnt.stroke();
+
+          xMnt.restore();
+        }
+
+        // ══════════════════════════════════════════════════════════
+        // LAYER 6: LOWER VALLEY CLOUDS (Lautan Awan Bawah Mengelilingi Kaki Gunung)
+        // ══════════════════════════════════════════════════════════
+        drawDriftingMist(H * 0.77, 70, 'rgba(18, 8, 38, 0.82)', 'rgba(34, 15, 66, 0.55)', fogOffset * 0.65);
+
+        // ══════════════════════════════════════════════════════════
+        // LAYER 7: FOREGROUND SUMMIT OVERLOOK & ROMANTIC SCENE
+        // ══════════════════════════════════════════════════════════
+        if (foreLedge.length > 1) {
+          xMnt.save();
+
+          xMnt.beginPath();
+          xMnt.moveTo(0, H);
+          foreLedge.forEach(p => xMnt.lineTo(p.x, p.y));
+          xMnt.lineTo(W, H);
+          xMnt.closePath();
+
+          const foreGrad = xMnt.createLinearGradient(0, H * 0.85, 0, H);
+          foreGrad.addColorStop(0, '#0c051a');
+          foreGrad.addColorStop(0.4, '#06020e');
+          foreGrad.addColorStop(1, '#020106');
+          xMnt.fillStyle = foreGrad;
+          xMnt.fill();
+
+          // Cliff rim stroke
+          xMnt.strokeStyle = 'rgba(168, 85, 247, 0.28)';
+          xMnt.lineWidth = 1.6;
+          xMnt.stroke();
+
+          // Alpine Pine Trees
+          pineTrees.forEach(tr => {
+            drawRealisticPine(xMnt, tr.x, tr.y, tr.h, tr.w);
+          });
+
+          // Romantic Couple on Summit Overlook (Clara & Boyfriend)
+          drawSummitCouple(xMnt, coupleOverlook.x, coupleOverlook.y);
+
+          xMnt.restore();
+        }
+      }
+
+      function drawRealisticPine(ctx, x, y, h, w) {
+        ctx.save();
+        ctx.fillStyle = '#05020c';
+
+        // Trunk
+        const trunkW = Math.max(3.5, w * 0.13);
+        const trunkH = h * 0.26;
+        ctx.fillRect(x - trunkW * 0.5, y - trunkH, trunkW, trunkH);
+
+        // Layered evergreen boughs
+        const tiers = 8;
+        const topY = y - h;
+        const foliageH = h - trunkH * 0.35;
+
+        for (let t = 0; t < tiers; t++) {
+          const prog = t / (tiers - 1);
+          const tierY = topY + foliageH * (0.06 + 0.94 * Math.pow(prog, 1.15));
+          const tierW = w * (0.20 + 0.80 * prog);
+          const tierH = (foliageH / tiers) * 1.55;
+
+          ctx.beginPath();
+          ctx.moveTo(x, tierY - tierH * 0.55);
+          ctx.quadraticCurveTo(x - tierW * 0.45, tierY - tierH * 0.12, x - tierW * 0.5, tierY);
+          ctx.lineTo(x - tierW * 0.28, tierY - tierH * 0.15);
+          ctx.lineTo(x, tierY - tierH * 0.05);
+          ctx.lineTo(x + tierW * 0.28, tierY - tierH * 0.15);
+          ctx.lineTo(x + tierW * 0.5, tierY);
+          ctx.quadraticCurveTo(x + tierW * 0.45, tierY - tierH * 0.12, x, tierY - tierH * 0.55);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        ctx.strokeStyle = 'rgba(192, 132, 252, 0.18)';
+        ctx.lineWidth = 0.9;
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      function drawSummitCouple(ctx, cx, cy) {
+        ctx.save();
+        const scale = Math.min(1.0, Math.max(0.72, W / 800));
+
+        // ── 1. WARM VINTAGE CAMPING LANTERN (Atmospheric Amber Glow) ──
+        const lanternX = cx + 50 * scale;
+        const lanternY = cy + 4 * scale;
+
+        const glow = ctx.createRadialGradient(lanternX, lanternY - 12 * scale, 3 * scale, lanternX, lanternY - 12 * scale, 85 * scale);
+        glow.addColorStop(0, 'rgba(254, 240, 138, 0.90)');
+        glow.addColorStop(0.25, 'rgba(251, 191, 36, 0.45)');
+        glow.addColorStop(0.65, 'rgba(245, 158, 11, 0.12)');
+        glow.addColorStop(1, 'transparent');
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(lanternX, lanternY - 12 * scale, 85 * scale, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Vintage lantern frame
+        ctx.fillStyle = '#05020a';
+        ctx.fillRect(lanternX - 6 * scale, lanternY - 2 * scale, 12 * scale, 3 * scale);
+        ctx.fillRect(lanternX - 5 * scale, lanternY - 19 * scale, 10 * scale, 3 * scale);
+        ctx.beginPath();
+        ctx.arc(lanternX, lanternY - 20 * scale, 3 * scale, 0, Math.PI, true);
+        ctx.fill();
+
+        // Glowing core mantle
+        ctx.fillStyle = '#fffbeb';
+        ctx.beginPath();
+        ctx.arc(lanternX, lanternY - 11 * scale, 3.5 * scale, 0, Math.PI * 2);
+        ctx.fill();
+
+        // ── 2. ROMANTIC COUPLE SILHOUETTE ──
+        ctx.fillStyle = '#06020d';
+
+        // Natural rock ledge under couple
+        ctx.beginPath();
+        ctx.ellipse(cx + 8 * scale, cy + 6 * scale, 48 * scale, 10 * scale, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // BOYFRIEND (Seated left, arm tenderly around Clara)
+        const bx = cx - 12 * scale;
+        const by = cy;
+
+        // Beanie & head
+        ctx.beginPath();
+        ctx.arc(bx, by - 38 * scale, 7.5 * scale, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(bx - 1 * scale, by - 44 * scale, 2.5 * scale, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Mountain jacket & torso
+        ctx.beginPath();
+        ctx.moveTo(bx - 10 * scale, by - 8 * scale);
+        ctx.lineTo(bx - 12 * scale, by - 28 * scale);
+        ctx.quadraticCurveTo(bx - 8 * scale, by - 33 * scale, bx, by - 32 * scale);
+        ctx.quadraticCurveTo(bx + 10 * scale, by - 32 * scale, bx + 14 * scale, by - 26 * scale);
+        ctx.lineTo(bx + 12 * scale, by - 8 * scale);
+        ctx.closePath();
+        ctx.fill();
+
+        // Arm wrapping around Clara
+        ctx.beginPath();
+        ctx.lineWidth = 5.5 * scale;
+        ctx.strokeStyle = '#06020d';
+        ctx.lineCap = 'round';
+        ctx.moveTo(bx - 6 * scale, by - 25 * scale);
+        ctx.quadraticCurveTo(bx + 8 * scale, by - 24 * scale, cx + 14 * scale, by - 21 * scale);
+        ctx.stroke();
+
+        // Legs seated on rock
+        ctx.beginPath();
+        ctx.moveTo(bx - 10 * scale, by - 8 * scale);
+        ctx.quadraticCurveTo(bx - 14 * scale, by + 4 * scale, bx - 8 * scale, by + 12 * scale);
+        ctx.lineTo(bx - 1 * scale, by + 12 * scale);
+        ctx.quadraticCurveTo(bx - 4 * scale, by + 2 * scale, bx + 2 * scale, by - 8 * scale);
+        ctx.closePath();
+        ctx.fill();
+
+        // CLARA (Seated right, leaning head lovingly on his shoulder)
+        const gx = cx + 10 * scale;
+        const gy = cy;
+
+        // Head tilted gently on boyfriend's shoulder
+        ctx.beginPath();
+        ctx.arc(gx - 4 * scale, gy - 33 * scale, 6.8 * scale, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Flowing hair silhouette
+        ctx.beginPath();
+        ctx.moveTo(gx - 6 * scale, gy - 36 * scale);
+        ctx.quadraticCurveTo(gx + 6 * scale, gy - 32 * scale, gx + 7 * scale, gy - 18 * scale);
+        ctx.quadraticCurveTo(gx + 2 * scale, gy - 15 * scale, gx - 1 * scale, gy - 24 * scale);
+        ctx.closePath();
+        ctx.fill();
+
+        // Cozy coat & torso
+        ctx.beginPath();
+        ctx.moveTo(gx - 4 * scale, gy - 26 * scale);
+        ctx.quadraticCurveTo(gx + 12 * scale, gy - 22 * scale, gx + 10 * scale, gy - 8 * scale);
+        ctx.lineTo(gx - 4 * scale, gy - 8 * scale);
+        ctx.closePath();
+        ctx.fill();
+
+        // Legs folded cozy on cliff ledge
+        ctx.beginPath();
+        ctx.moveTo(gx - 2 * scale, gy - 8 * scale);
+        ctx.quadraticCurveTo(gx + 14 * scale, gy - 4 * scale, gx + 18 * scale, by + 6 * scale);
+        ctx.quadraticCurveTo(gx + 12 * scale, by + 12 * scale, gx + 4 * scale, by + 10 * scale);
+        ctx.quadraticCurveTo(gx + 4 * scale, by + 2 * scale, gx - 2 * scale, gy - 8 * scale);
+        ctx.closePath();
+        ctx.fill();
+
+        // Warm lantern rim light grazing Clara's back & coat
+        ctx.strokeStyle = 'rgba(253, 224, 71, 0.45)';
+        ctx.lineWidth = 1.3 * scale;
+        ctx.beginPath();
+        ctx.arc(lanternX - 18 * scale, gy - 12 * scale, 12 * scale, -Math.PI * 0.3, Math.PI * 0.4);
+        ctx.stroke();
+
+        // Alpine grass blades swaying on cliff edge
+        ctx.strokeStyle = '#05020a';
+        ctx.lineWidth = 1.2 * scale;
+        for (let g = -25; g <= 45; g += 6) {
+          const gx0 = cx + g * scale;
+          const gy0 = cy + 5 * scale;
+          ctx.beginPath();
+          ctx.moveTo(gx0, gy0);
+          ctx.quadraticCurveTo(gx0 + (g % 3 - 1) * 3 * scale, gy0 - 9 * scale, gx0 + (g % 2 === 0 ? 3 : -3) * scale, gy0 - 12 * scale);
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      }
+
+      function drawDriftingMist(baseY, height, color1, color2, offset) {
+        xMnt.save();
+        for (let i = 0; i < 6; i++) {
+          const cx = ((i * (W / 4) + offset * 18) % (W + 200)) - 100;
+          const cy = baseY + Math.sin((cx + offset * 10) * 0.005) * 12;
+          const rw = W * 0.38;
+          const rh = height;
+
+          const g = xMnt.createRadialGradient(cx, cy, 5, cx, cy, rw);
+          g.addColorStop(0, color1);
+          g.addColorStop(0.6, color2);
+          g.addColorStop(1, 'transparent');
+
+          xMnt.fillStyle = g;
+          xMnt.beginPath();
+          xMnt.ellipse(cx, cy, rw, rh, 0, 0, Math.PI * 2);
+          xMnt.fill();
+        }
+        xMnt.restore();
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         MAIN ANIMATION LOOP
+      ═══════════════════════════════════════════════════════════════ */
+      function loop() {
+        drawAurora();
+        drawStars();
+        drawMountains();
+        updateAndDrawLanterns();
+        drawEndingConstellation();
+        drawPetals();
+        requestAnimationFrame(loop);
+      }
+
+      // Initialize geometry and kick off loop
+      resize();
+      window.addEventListener('resize', resize);
+      requestAnimationFrame(loop);
+
+    })();
+  </script>
+</body>
+
+</html>
